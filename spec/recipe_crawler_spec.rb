@@ -7,7 +7,11 @@ describe RecipeCrawler do
   end
 
   it 'should instanciate a recipe' do
-    expect(RecipeCrawler::Crawler).not_to be nil
+    expect(RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/').not_to be nil
+  end
+
+  it 'should not instanciate with this bad url'  do
+  	expect{RecipeCrawler::Crawler.new 'http://www.google.com'}.to raise_error ArgumentError
   end
 
 end
