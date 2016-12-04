@@ -6,9 +6,13 @@ require 'open-uri'
 module RecipeCrawler
 
 	# This is the main class to crawl recipes from a given url
+	#   1. Crawler will crawl url to find others recipes urls on the website
+	#   2. it will crawl urls founded to find other url again & again
+	#   3. it will scrape urls founded to get data
 	#
 	# @attr url [String] first url parsed
 	# @attr host [Symbol] of url's host
+	# @attr scraped_urls [Array] of url's host
 	# @attr crawled_urls [Array] of url's host
 	# @attr to_crawl_urls [Array] of url's host
 	class Crawler
@@ -20,7 +24,7 @@ module RecipeCrawler
 			g750: 'http://www.750g.com/'
 		}
 
-		attr_reader :url, :host, :crawled_urls, :to_crawl_urls
+		attr_reader :url, :host, :crawled_urls, :crawled_urls, :to_crawl_urls
 
 
 		# 
@@ -57,14 +61,22 @@ module RecipeCrawler
 		# Start the crawl
 		# @param limit=10
 		def crawl! limit=2
+			# find all link on url given (and urls of theses)
 			if @host == :cuisineaz
 				while !@to_crawl_urls.empty?
-					scrape to_crawl_urls[0]
+					$stdout.puts scrape to_crawl_urls[0]
 					break  if @crawled_urls.count > limit
 				end
+
 			else
 				raise NotImplementedError
 			end
+
+			# scrap urls 
+			@crawled_urls.each{|crawled_url|
+				yield RecipeSraper::Recipe.new crawled_url
+			}
+
 		end
 
 
@@ -92,6 +104,7 @@ module RecipeCrawler
 				@to_crawl_urls.delete url
 				warn "#{url} cannot be reached"
 			end
+			
 		end
 
 	end
