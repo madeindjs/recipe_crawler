@@ -21,4 +21,14 @@ describe RecipeCrawler do
     expect(RecipeCrawler::Crawler.new('http://www.750g.com/sapin-de-noel-on-le-mange-r200307.htm').host).to equal :g750
   end
 
+  it "should found links on page" do
+    r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
+    r.crawl!
+
+    r.to_crawl_url
+    expect(r.to_crawl_url.empty?).not_to be true
+
+  end
+
+
 end

@@ -1,5 +1,7 @@
 require 'recipe_scraper'
 require 'nokogiri'
+require 'open-uri'
+
 
 module RecipeCrawler
 
@@ -7,6 +9,8 @@ module RecipeCrawler
 	#
 	# @attr url [String] first url parsed
 	# @attr host [Symbol] of url's host
+	# @attr crawled_url [Array] of url's host
+	# @attr to_crawl_url [Array] of url's host
 	class Crawler
 
 		# URL than crawler can parse
@@ -16,7 +20,7 @@ module RecipeCrawler
 			g750: 'http://www.750g.com/'
 		}
 
-		attr_reader :url, :host
+		attr_reader :url, :host, :crawled_url, :to_crawl_url
 
 
 		# 
@@ -39,13 +43,27 @@ module RecipeCrawler
 		# @param url [String] a url a recipe to scrawl other one
 		def initialize url
 			@url = url
-			raise ArgumentError , 'This url cannot be used' unless url_valid?
+			if url_valid?
+				@crawled_url = []
+				@to_crawl_url = []
+				@to_crawl_url << url
+			else
+				raise ArgumentError , 'This url cannot be used'
+			end
 		end
 
 		#
 		# Start the crawl
 		def crawl!
-			# @TODO write logic here
+			if @host == :cuisineaz
+				doc = Nokogiri::HTML(open("http://www.threescompany.com/"))
+				doc.css('#tagCloud ul li a').each do |link|
+					@to_crawl_url << link.attr('href')
+					puts @to_crawl_url
+				end
+			else
+				raise NotImplementedError
+			end
 		end
 
 	end
