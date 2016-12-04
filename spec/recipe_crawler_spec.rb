@@ -15,7 +15,10 @@ describe RecipeCrawler do
     expect{RecipeCrawler::Crawler.new 'http://www.google.com'}.to raise_error ArgumentError
   end
 
-  it "should start to crawl" do
+  it "should found host" do
+    expect(RecipeCrawler::Crawler.new('http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx').host).to equal :cuisineaz
+    expect(RecipeCrawler::Crawler.new('http://www.marmiton.org/recettes/recette_baba-au-rhum-express_13608.aspx').host).to equal :marmiton
+    expect(RecipeCrawler::Crawler.new('http://www.750g.com/sapin-de-noel-on-le-mange-r200307.htm').host).to equal :g750
   end
 
 end
