@@ -9,8 +9,8 @@ module RecipeCrawler
 	#
 	# @attr url [String] first url parsed
 	# @attr host [Symbol] of url's host
-	# @attr crawled_url [Array] of url's host
-	# @attr to_crawl_url [Array] of url's host
+	# @attr crawled_urls [Array] of url's host
+	# @attr to_crawl_urls [Array] of url's host
 	class Crawler
 
 		# URL than crawler can parse
@@ -20,7 +20,7 @@ module RecipeCrawler
 			g750: 'http://www.750g.com/'
 		}
 
-		attr_reader :url, :host, :crawled_url, :to_crawl_url
+		attr_reader :url, :host, :crawled_urls, :to_crawl_urls
 
 
 		# 
@@ -44,25 +44,53 @@ module RecipeCrawler
 		def initialize url
 			@url = url
 			if url_valid?
-				@crawled_url = []
-				@to_crawl_url = []
-				@to_crawl_url << url
+				@crawled_urls = []
+				@to_crawl_urls = []
+				@to_crawl_urls << url
 			else
 				raise ArgumentError , 'This url cannot be used'
 			end
 		end
 
+
 		#
 		# Start the crawl
-		def crawl!
+		# @param limit=10
+		def crawl! limit=2
 			if @host == :cuisineaz
-				doc = Nokogiri::HTML(open("http://www.threescompany.com/"))
-				doc.css('#tagCloud ul li a').each do |link|
-					@to_crawl_url << link.attr('href')
-					puts @to_crawl_url
+				while !@to_crawl_urls.empty?
+					scrape to_crawl_urls[0]
+					break  if @crawled_urls.count > limit
 				end
 			else
 				raise NotImplementedError
+			end
+		end
+
+
+		#
+		# Scrape the specified url
+		# @param url [String] as url to craw
+		def scrape url
+			# catch 404 error from host
+			begin
+				doc = Nokogiri::HTML(open(url))
+				# find internal links on page
+				doc.css('#tagCloud  a').each do |link|
+					link = link.attr('href')
+					# If link correspond to a recipe we add it to recipe to scraw
+					if link.include?(ALLOWED_URLS[@host]) and !@crawled_urls.include?(url)
+						$stderr.puts link
+						@to_crawl_urls << link
+					end
+				end
+				@to_crawl_urls.delete url
+				@crawled_urls << url
+				@to_crawl_urls.uniq!
+
+			rescue OpenURI::HTTPError
+				@to_crawl_urls.delete url
+				warn "#{url} cannot be reached"
 			end
 		end
 

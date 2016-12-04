@@ -24,10 +24,7 @@ describe RecipeCrawler do
   it "should found links on page" do
     r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
     r.crawl!
-
-    r.to_crawl_url
-    expect(r.to_crawl_url.empty?).not_to be true
-
+    expect(r.crawled_urls).not_to be []
   end
 
 
