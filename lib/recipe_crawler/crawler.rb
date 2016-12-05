@@ -80,28 +80,22 @@ module RecipeCrawler
 		#
 		# @yield [RecipeSraper::Recipe] as recipe scraped
 		def crawl! limit=2, interval_sleep_time=0
-			# find all link on url given (and urls of theses)
+			recipes_returned = 0
+			
 			if @host == :cuisineaz
-				while !@to_crawl_urls.empty?
-					get_links to_crawl_urls[0]
-					break if @crawled_urls.count > limit
+
+				while !@to_crawl_urls.empty? and limit > @recipes.count
+					# find all link on url given (and urls of theses)
+					get_links @to_crawl_urls[0]
+					# now scrape an url
+					recipe = scrape @to_crawl_urls[0]
+					yield recipe if block_given?
+					sleep interval_sleep_time
 				end
 
 			else
 				raise NotImplementedError
 			end
-
-			# scrap urls
-			recipes_returned = 0
-			@crawled_urls.each{ |crawled_url|
-				if limit > recipes_returned
-					yield scrape crawled_url
-					recipes_returned += 1
-					sleep interval_sleep_time
-				else
-					break
-				end
-			} if block_given?
 		end
 
 
