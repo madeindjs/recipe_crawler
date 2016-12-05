@@ -11,14 +11,13 @@ module RecipeCrawler
 	#   2. it will crawl urls founded to find other url again & again
 	#   3. it will scrape urls founded to get data
 	#
-	# @attr url [String] first url parsed
-	# @attr host [Symbol] of url's host
-	# @attr scraped_urls [Array<String>] of url's host
-	# @attr crawled_urls [Array<String>] of url's host
-	# @attr to_crawl_urls [Array<String>] of url's host
-	# @attr recipes [Array<RecipeSraper::Recipe>] recipes fetched
-	#
-	# @attr db [SQLite3::Database] Sqlite database where recipe will be saved
+	# @attr_reader url [String] first url parsed
+	# @attr_reader host [Symbol] of url's host
+	# @attr_reader scraped_urls [Array<String>] of url's host
+	# @attr_reader crawled_urls [Array<String>] of url's host
+	# @attr_reader to_crawl_urls [Array<String>] of url's host
+	# @attr_reader recipes [Array<RecipeSraper::Recipe>] recipes fetched
+	# @attr_reader db [SQLite3::Database] Sqlite database where recipe will be saved
 	class Crawler
 
 		# URL than crawler can parse
@@ -29,7 +28,7 @@ module RecipeCrawler
 		}
 
 		attr_reader :url, :host, :scraped_urls, :crawled_urls, :to_crawl_urls, :recipes
-
+		attr_accessor :interval_sleep_time
 
 		# 
 		# Create a Crawler
@@ -42,6 +41,7 @@ module RecipeCrawler
 				@scraped_urls = []
 				@to_crawl_urls = []
 				@to_crawl_urls << url
+				@interval_sleep_time = 0
 				@db = SQLite3::Database.new "results.sqlite3"
 				@db.execute "CREATE TABLE IF NOT EXISTS recipes(
 					Id INTEGER PRIMARY KEY, 
@@ -75,31 +75,27 @@ module RecipeCrawler
 
 		#
 		# Start the crawl
-		# @param limit [Integer]
+		# @param limit [Integer] the maximum number of scraped recipes
+		# @param interval_sleep_time [Integer] waiting time between scraping
 		#
 		# @yield [RecipeSraper::Recipe] as recipe scraped
-		def crawl! limit=2
-			# find all link on url given (and urls of theses)
+		def crawl! limit=2, interval_sleep_time=0
+			recipes_returned = 0
+			
 			if @host == :cuisineaz
-				while !@to_crawl_urls.empty?
-					get_links to_crawl_urls[0]
-					break if @crawled_urls.count > limit
+
+				while !@to_crawl_urls.empty? and limit > @recipes.count
+					# find all link on url given (and urls of theses)
+					get_links @to_crawl_urls[0]
+					# now scrape an url
+					recipe = scrape @to_crawl_urls[0]
+					yield recipe if block_given?
+					sleep interval_sleep_time
 				end
 
 			else
 				raise NotImplementedError
 			end
-
-			# scrap urls
-			recipes_returned = 0
-			@crawled_urls.each{ |crawled_url|
-				if limit > recipes_returned
-					yield scrape crawled_url
-					recipes_returned += 1
-				else
-					break
-				end
-			} if block_given?
 		end
 
 

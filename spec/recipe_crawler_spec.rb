@@ -36,8 +36,8 @@ describe RecipeCrawler do
 
 
   it "should yield not more limit" do
-    r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
-    limit = 2
+    r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/concombre-a-la-creme-fraiche-et-a-la-ciboulette-56227.aspx'
+    limit = 8
     expect { |block| r.crawl! limit, &block }.to yield_control.exactly(limit).times
     expect(r.recipes.count).to equal limit
   end

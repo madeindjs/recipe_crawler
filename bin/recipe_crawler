@@ -5,13 +5,15 @@ require "optparse"
 
 options = {
   limit: 1,
-  url: nil
+  url: nil,
+  interval_time: 0
 }
 
 # Parse options
 optparser = OptionParser.new do |opts|
   opts.on("-n", "--number x", Integer, "Number of recipes to fetch") { |x| options[:number] = x}
   opts.on("-u", "--url url", String, "URL of a recipe to fetch") { |x| options[:url] = x}
+  opts.on("-i", "--interval_time x", Integer, "Wainting time between requests") { |x| options[:interval_time] = x}
   opts.parse!(ARGV)
 end
 
@@ -22,7 +24,7 @@ if options[:url]
   r = RecipeCrawler::Crawler.new options[:url]
 
   # crawl and display recipe fetched
-  r.crawl!(options[:number]) do |recipe|
+  r.crawl!(options[:number], options[:interval_time]) do |recipe|
     puts "[x] #{recipe.title} fetched!"
   end
 
