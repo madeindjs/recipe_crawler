@@ -12,9 +12,10 @@ module RecipeCrawler
 	#
 	# @attr url [String] first url parsed
 	# @attr host [Symbol] of url's host
-	# @attr scraped_urls [Array] of url's host
-	# @attr crawled_urls [Array] of url's host
-	# @attr to_crawl_urls [Array] of url's host
+	# @attr scraped_urls [Array<String>] of url's host
+	# @attr crawled_urls [Array<String>] of url's host
+	# @attr to_crawl_urls [Array<String>] of url's host
+	# @attr recipes [Array<RecipeSraper::Recipe>] recipes fetched
 	class Crawler
 
 		# URL than crawler can parse
@@ -24,7 +25,7 @@ module RecipeCrawler
 			g750: 'http://www.750g.com/'
 		}
 
-		attr_reader :url, :host, :crawled_urls, :crawled_urls, :to_crawl_urls
+		attr_reader :url, :host, :scraped_urls, :crawled_urls, :to_crawl_urls, :recipes
 
 
 		# 
@@ -48,7 +49,9 @@ module RecipeCrawler
 		def initialize url
 			@url = url
 			if url_valid?
+				@recipes = []
 				@crawled_urls = []
+				@scraped_urls = []
 				@to_crawl_urls = []
 				@to_crawl_urls << url
 			else
@@ -59,31 +62,53 @@ module RecipeCrawler
 
 		#
 		# Start the crawl
-		# @param limit=10
+		# @param limit [Integer]
+		#
+		# @yield [RecipeSraper::Recipe] as recipe scraped
 		def crawl! limit=2
 			# find all link on url given (and urls of theses)
 			if @host == :cuisineaz
 				while !@to_crawl_urls.empty?
-					$stdout.puts scrape to_crawl_urls[0]
-					break  if @crawled_urls.count > limit
+					get_links to_crawl_urls[0]
+					break if @crawled_urls.count > limit
 				end
 
 			else
 				raise NotImplementedError
 			end
 
-			# scrap urls 
-			@crawled_urls.each{|crawled_url|
-				yield RecipeSraper::Recipe.new crawled_url
-			}
-
+			# scrap urls
+			recipes_returned = 0
+			@crawled_urls.each{ |crawled_url|
+				if limit > recipes_returned
+					yield scrape crawled_url
+					recipes_returned += 1
+				else
+					break
+				end
+			} if block_given?
 		end
 
 
 		#
-		# Scrape the specified url
-		# @param url [String] as url to craw
+		# Scrape given url
+		# param url [String] as url to scrape
+		#
+		# @return [RecipeSraper::Recipe] as recipe scraped
 		def scrape url
+			recipe = RecipeSraper::Recipe.new url
+			@scraped_urls << url
+			@recipes << recipe
+			return recipe
+		end
+
+
+		#
+		# Get recipes links from the given url
+		# @param url [String] as url to scrape
+		#
+		# @return [void]
+		def get_links url
 			# catch 404 error from host
 			begin
 				doc = Nokogiri::HTML(open(url))
@@ -92,7 +117,6 @@ module RecipeCrawler
 					link = link.attr('href')
 					# If link correspond to a recipe we add it to recipe to scraw
 					if link.include?(ALLOWED_URLS[@host]) and !@crawled_urls.include?(url)
-						$stderr.puts link
 						@to_crawl_urls << link
 					end
 				end
@@ -104,7 +128,6 @@ module RecipeCrawler
 				@to_crawl_urls.delete url
 				warn "#{url} cannot be reached"
 			end
-			
 		end
 
 	end

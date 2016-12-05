@@ -23,14 +23,23 @@ describe RecipeCrawler do
 
   it "should found links on page" do
     r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
+    r.crawl!(1)
     expect(r.crawled_urls).not_to be []
   end
 
   it "should yield RecipeScraper" do
     r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
-    r.crawl! do |recipe|
+    r.crawl!(1) do |recipe|
       expect(recipe).to be_kind_of(RecipeSraper::Recipe)
     end
+  end
+
+
+  it "should yield not more limit" do
+    r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
+    limit = 2
+    expect { |block| r.crawl! limit, &block }.to yield_control.exactly(limit).times
+    expect(r.recipes.count).to equal limit
   end
 
 
