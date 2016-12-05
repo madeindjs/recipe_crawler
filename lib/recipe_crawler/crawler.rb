@@ -89,7 +89,7 @@ module RecipeCrawler
 					get_links @to_crawl_urls[0]
 					# now scrape an url
 					recipe = scrape @to_crawl_urls[0]
-					yield recipe if block_given?
+					yield recipe if recipe and block_given?
 					sleep interval_sleep_time
 				end
 
@@ -104,14 +104,19 @@ module RecipeCrawler
 		# param url [String] as url to scrape
 		#
 		# @return [RecipeSraper::Recipe] as recipe scraped
+		# @return [nil] if recipe connat be fetched
 		def scrape url
-			recipe = RecipeSraper::Recipe.new url
-			@scraped_urls << url
-			@recipes << recipe
-			if save recipe
-				return recipe
-			else
-				raise SQLite3::Exception, 'accnot save recipe'
+			begin
+				recipe = RecipeSraper::Recipe.new url
+				@scraped_urls << url
+				@recipes << recipe
+				if save recipe
+					return recipe
+				else
+					raise SQLite3::Exception, 'cannot save recipe'
+				end
+			rescue OpenURI::HTTPError
+				return nil
 			end
 		end
 
