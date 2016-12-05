@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require "recipe_crawler"
+require "optparse"
+
+options = {
+  limit: 1,
+  url: nil
+}
+
+# Parse options
+optparser = OptionParser.new do |opts|
+  opts.on("-n", "--number x", Integer, "Number of recipes to fetch") { |x| options[:number] = x}
+  opts.on("-u", "--url url", String, "URL of a recipe to fetch") { |x| options[:url] = x}
+  opts.parse!(ARGV)
+end
+
+# check if url is set
+if options[:url]
+
+  # Instanciate the crawler
+  r = RecipeCrawler::Crawler.new options[:url]
+
+  # crawl and display recipe fetched
+  r.crawl!(options[:number]) do |recipe|
+    puts "[x] #{recipe.title} fetched!"
+  end
+
+else
+  raise OptionParser::MissingArgument, 'You need to specify a start url.'
+end
