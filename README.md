@@ -1,8 +1,13 @@
 # RecipeCrawler
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/recipe_crawler`. To experiment with that code, run `bin/console` for an interactive prompt.
+A **web crawler** to save recipes from [marmiton.org](http://www.marmiton.org/), [750g.com](http://www.750g.com) or [cuisineaz.com](http://www.cuisineaz.com) into an **SQlite3** database. 
 
-TODO: Delete this and the text above, and describe your gem
+> For the moment, it works only with [cuisineaz.com](http://www.cuisineaz.com)
+
+This *Rubygems* use my other **powerfull** [recipe_scraper](https://github.com/madeindjs/recipe_scraper) gem to scrape data on these websites.
+
+To experiment with that code, run `bin/console` for an interactive prompt.
+
 
 ## Installation
 
@@ -22,11 +27,40 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Command line
+
+> TODO
+
+### API
+
+Install & import the library:
+
+    require 'recipe_scraper'
+
+Then you just need to instanciate a `RecipeCrawler::Crawler` with url of a CuisineAZ's recipe.
+
+    url = 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
+    r = RecipeCrawler::Crawler.new url
+
+Then you just need to run the crawl with a limit number of recipe to fetch. All recipes will be saved in a *export.sqlite3* file. You can pass a block to play with `RecipeSraper::Recipe` objects.
+
+    r.crawl!(10) do |recipe|
+        puts recipe.to_hash
+        # will return
+        # --------------
+        # { :cooktime => 7,
+        #        :image => "http://images.marmitoncdn.org/recipephotos/multiphoto/7b/7b4e95f5-37e0-4294-bebe-cde86c30817f_normal.jpg",
+        #        :ingredients => ["2 beaux avocat", "2 steaks hachés de boeuf", "2 tranches de cheddar", "quelques feuilles de salade", "1/2 oignon rouge", "1 tomate", "graines de sésame", "1 filet d'huile d'olive", "1 pincée de sel", "1 pincée de poivre"],
+        #        :preptime => 20,
+        #        :steps => ["Laver et couper la tomate en rondelles", "Cuire les steaks à la poêle avec un filet d'huile d'olive", "Saler et poivrer", "Toaster les graines de sésames", "Ouvrir les avocats en 2, retirer le noyau et les éplucher", "Monter les burger en plaçant un demi-avocat face noyau vers le haut, déposer un steak, une tranche de cheddar sur le steak bien chaud pour qu'elle fonde, une rondelle de tomate, une rondelle d'oignon, quelques feuilles de salade et terminer par la seconde moitié d'avocat", "Parsemer quelques graines de sésames."],
+        #        :title => "Burger d'avocat",
+        #  }
+    end
+
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. You can also run `yard` to generate the documentation.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
@@ -39,3 +73,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
+Author
+----------
+
+[Rousseau Alexandre](https://github.com/madeindjs)

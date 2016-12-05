@@ -23,11 +23,29 @@ describe RecipeCrawler do
 
   it "should found links on page" do
     r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
-    r.crawl!
+    r.crawl!(1)
+    expect(r.crawled_urls).not_to be []
+  end
 
-    r.to_crawl_url
-    expect(r.to_crawl_url.empty?).not_to be true
+  it "should yield RecipeScraper" do
+    r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
+    r.crawl!(1) do |recipe|
+      expect(recipe).to be_kind_of(RecipeSraper::Recipe)
+    end
+  end
 
+
+  it "should yield not more limit" do
+    r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
+    limit = 2
+    expect { |block| r.crawl! limit, &block }.to yield_control.exactly(limit).times
+    expect(r.recipes.count).to equal limit
+  end
+
+
+  it "should create a result.sqlite3 file" do
+    r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
+    expect File.exists?('result.sqlite3')
   end
 
 
