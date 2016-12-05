@@ -43,4 +43,10 @@ describe RecipeCrawler do
   end
 
 
+  it "should create a result.sqlite3 file" do
+    r = RecipeCrawler::Crawler.new 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
+    expect File.exists?('result.sqlite3')
+  end
+
+
 end

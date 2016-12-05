@@ -1,6 +1,7 @@
 require 'recipe_scraper'
 require 'nokogiri'
 require 'open-uri'
+require 'sqlite3'
 
 
 module RecipeCrawler
@@ -16,6 +17,8 @@ module RecipeCrawler
 	# @attr crawled_urls [Array<String>] of url's host
 	# @attr to_crawl_urls [Array<String>] of url's host
 	# @attr recipes [Array<RecipeSraper::Recipe>] recipes fetched
+	#
+	# @attr db [SQLite3::Database] Sqlite database where recipe will be saved
 	class Crawler
 
 		# URL than crawler can parse
@@ -26,6 +29,33 @@ module RecipeCrawler
 		}
 
 		attr_reader :url, :host, :scraped_urls, :crawled_urls, :to_crawl_urls, :recipes
+
+
+		# 
+		# Create a Crawler
+		# @param url [String] a url a recipe to scrawl other one
+		def initialize url
+			@url = url
+			if url_valid?
+				@recipes = []
+				@crawled_urls = []
+				@scraped_urls = []
+				@to_crawl_urls = []
+				@to_crawl_urls << url
+				@db = SQLite3::Database.new "results.sqlite3"
+				@db.execute "CREATE TABLE IF NOT EXISTS recipes(
+					Id INTEGER PRIMARY KEY, 
+					title TEXT, 
+					preptime INTEGER, 
+					cooktime INTEGER, 
+					ingredients TEXT, 
+					steps TEXT, 
+					image TEXT
+				)"
+			else
+				raise ArgumentError , 'This url cannot be used'
+			end
+		end
 
 
 		# 
@@ -40,23 +70,6 @@ module RecipeCrawler
 				end
 			end
 			return false
-		end
-
-
-		# 
-		# Create a Crawler
-		# @param url [String] a url a recipe to scrawl other one
-		def initialize url
-			@url = url
-			if url_valid?
-				@recipes = []
-				@crawled_urls = []
-				@scraped_urls = []
-				@to_crawl_urls = []
-				@to_crawl_urls << url
-			else
-				raise ArgumentError , 'This url cannot be used'
-			end
 		end
 
 
@@ -130,7 +143,6 @@ module RecipeCrawler
 			end
 		end
 
-	end
 
 
 end
