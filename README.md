@@ -29,7 +29,25 @@ Or install it yourself as:
 
 ### Command line
 
-> TODO
+Install this gem and run 
+
+    $ recipe_crawler -h
+    Usage: recipe_crawler [options]
+        -n, --number x                   Number of recipes to fetch
+        -u, --url url                    URL of a recipe to fetch
+
+So you just need to specify the first recipe url and the number of recipes wanted. Simple like this :
+
+    $ recipe_crawler -u http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx -n 8
+    [x] Pâte à pizza légère fetched!
+    [x] Pâtes au jambon cuit fetched!
+    [x] Oeufs au plat sucrés fetched!
+    [x] Pizza légère fetched!
+    [x] Vin cuit fetched!
+    [x] Tiramisu aux framboises simplissime et rapide fetched!
+    [x] Risotto aux champignons et au parmesan fetched!
+    [x] Gnocchi fetched!
+
 
 ### API
 
