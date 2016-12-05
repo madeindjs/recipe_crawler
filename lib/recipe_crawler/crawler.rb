@@ -112,7 +112,11 @@ module RecipeCrawler
 			recipe = RecipeSraper::Recipe.new url
 			@scraped_urls << url
 			@recipes << recipe
-			return recipe
+			if save recipe
+				return recipe
+			else
+				raise SQLite3::Exception, 'accnot save recipe'
+			end
 		end
 
 
@@ -143,6 +147,30 @@ module RecipeCrawler
 			end
 		end
 
+
+		#
+		# Save recipe
+		# @param recipe [RecipeSraper::Recipe] as recipe to save
+		#
+		# @return [Boolean] as true if success
+		def save recipe
+			begin
+				@db.execute "INSERT INTO recipes (title, preptime, cooktime, ingredients, steps, image)
+						VALUES (:title, :preptime, :cooktime, :ingredients, :steps, :image)",
+						title: recipe.title,
+						preptime: recipe.preptime,
+						ingredients: recipe.ingredients.join("\n"),
+						steps: recipe.steps.join("\n"),
+						image: recipe.image
+
+				return true
+				
+			rescue SQLite3::Exception => e 
+					puts "Exception occurred #{e}"
+					return false
+			end
+		end
+	end
 
 
 end
