@@ -1,5 +1,7 @@
 # RecipeCrawler
 
+[![Gem Version](https://badge.fury.io/rb/recipe_crawler.svg)](https://rubygems.org/gems/recipe_crawler)
+
 A **web crawler** to save recipes from [marmiton.org](http://www.marmiton.org/), [750g.com](http://www.750g.com) or [cuisineaz.com](http://www.cuisineaz.com) into an **SQlite3** database. 
 
 > For the moment, it works only with [cuisineaz.com](http://www.cuisineaz.com)
