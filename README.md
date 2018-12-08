@@ -1,8 +1,6 @@
 # RecipeCrawler
 
-[![Gem Version](https://badge.fury.io/rb/recipe_crawler.svg)](https://rubygems.org/gems/recipe_crawler)
-
-A **web crawler** to save recipes from [marmiton.org](http://www.marmiton.org/), [750g.com](http://www.750g.com) or [cuisineaz.com](http://www.cuisineaz.com) into an **SQlite3** database. 
+A **web crawler** to save recipes from [marmiton.org](http://www.marmiton.org/), [750g.com](http://www.750g.com) or [cuisineaz.com](http://www.cuisineaz.com) into an **SQlite3** database.
 
 > For the moment, it works only with [cuisineaz.com](http://www.cuisineaz.com)
 
@@ -31,7 +29,7 @@ Or install it yourself as:
 
 ### Command line
 
-Install this gem and run 
+Install this gem and run
 
     $ recipe_crawler -h
     Usage: recipe_crawler [options]
@@ -62,9 +60,9 @@ Then you just need to instanciate a `RecipeCrawler::Crawler` with url of a Cuisi
     url = 'http://www.cuisineaz.com/recettes/pate-a-pizza-legere-55004.aspx'
     r = RecipeCrawler::Crawler.new url
 
-Then you just need to run the crawl with a limit number of recipe to fetch. All recipes will be saved in a *export.sqlite3* file. You can pass a block to play with `RecipeSraper::Recipe` objects.
+Then you just need to run the crawl with a limit number of recipe to fetch. All recipes will be saved in a *export.sqlite3* file. You can pass a block to play with `RecipeScraper::Recipe` objects.
 
-    r.crawl!(10) do |recipe|
+    r.crawl!(limit: 10) do |recipe|
         puts recipe.to_hash
         # will return
         # --------------
@@ -93,7 +91,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
-Author
-----------
+## Author
 
 [Rousseau Alexandre](https://github.com/madeindjs)

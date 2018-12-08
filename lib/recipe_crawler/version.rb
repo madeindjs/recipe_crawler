@@ -1,3 +1,3 @@
 module RecipeCrawler
-  VERSION = "3.1.2"
+  VERSION = '4.0.0'.freeze
 end
